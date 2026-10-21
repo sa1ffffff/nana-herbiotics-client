@@ -1,4 +1,6 @@
+import type { CSSProperties } from 'react'
 import { byId } from '../data/products'
+import { useTilt } from '../lib/useTilt'
 import { ProductImage } from './ProductImage'
 import { LeafIcon, TruckIcon } from './Icons'
 import { Corners } from './Ornaments'
@@ -6,6 +8,7 @@ import { Corners } from './Ornaments'
 const trio = ['herbal-shampoo', 'hibiscus-shampoo', 'herbal-conditioner'].map((id) => byId(id)!)
 
 export function Hero() {
+  const tilt = useTilt<HTMLDivElement>({ max: 9, drag: true })
   return (
     <section id="home" className="engraved relative overflow-hidden text-ivory">
       <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 pt-8 pb-12 md:grid-cols-[1.1fr_1fr] md:gap-12 md:py-20">
@@ -36,22 +39,28 @@ export function Hero() {
           </p>
         </div>
 
-        <div className="label-frame relative mx-auto w-full max-w-[22rem] overflow-hidden rounded-t-[999px] rounded-b-3xl bg-white px-3 pt-10 md:max-w-md">
-          <Corners className="text-gold/70" />
-          <div className="grid grid-cols-3 items-end">
-            {trio.map((p, i) => (
-              <ProductImage
-                key={p.id}
-                product={p}
-                eager
-                sizes="(min-width: 768px) 160px, 30vw"
-                className={`aspect-[1/2] w-full object-cover ${i === 1 ? '' : 'origin-bottom scale-90'}`}
-              />
-            ))}
+        <div ref={tilt} className="tilt-stage mx-auto w-full max-w-[22rem] touch-pan-y select-none md:max-w-md">
+          <div className="tilt-body relative">
+            <div className="label-frame absolute inset-0 overflow-hidden rounded-t-[999px] rounded-b-3xl bg-white" aria-hidden>
+              <Corners className="text-gold/70" />
+              <div className="tilt-sheen absolute inset-0" />
+            </div>
+            <div className="preserve-3d relative grid grid-cols-3 items-end px-3 pt-10">
+              {trio.map((p, i) => (
+                <div key={p.id} className="hero-bottle depth" style={{ '--z': i === 1 ? '56px' : '28px', '--i': i } as CSSProperties}>
+                  <ProductImage
+                    product={p}
+                    eager
+                    sizes="(min-width: 768px) 160px, 30vw"
+                    className={`aspect-[1/2] w-full object-cover ${i === 1 ? '' : 'origin-bottom scale-90'}`}
+                  />
+                </div>
+              ))}
+            </div>
+            <p className="depth relative flex items-center justify-center gap-2 py-3 text-center font-display text-sm font-semibold tracking-wider text-forest" style={{ '--z': '18px' } as CSSProperties}>
+              <LeafIcon width={16} height={16} className="text-gold" /> Rooted in Nature · Est. 2024
+            </p>
           </div>
-          <p className="relative flex items-center justify-center gap-2 py-3 text-center font-display text-sm font-semibold tracking-wider text-forest">
-            <LeafIcon width={16} height={16} className="text-gold" /> Rooted in Nature · Est. 2024
-          </p>
         </div>
       </div>
     </section>

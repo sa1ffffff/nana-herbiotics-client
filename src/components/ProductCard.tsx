@@ -5,6 +5,7 @@ import { useCart } from '../store/cart'
 import { Corners } from './Ornaments'
 import { ProductImage } from './ProductImage'
 import { QtyStepper } from './QtyStepper'
+import { useTilt } from '../lib/useTilt'
 
 /** Products shot in the studio have extra white margin, so they can fill the well more. */
 const STUDIO = new Set(['herbal-shampoo', 'hibiscus-shampoo', 'herbal-conditioner', 'herbal-body-wash', 'herbal-face-wash'])
@@ -46,17 +47,20 @@ export function ProductCard({ product }: { product: Product }) {
   const [qty, setQty] = useState(1)
   const add = useCart((s) => s.add)
   const setQuickView = useCart((s) => s.setQuickView)
+  const tilt = useTilt<HTMLButtonElement>({ max: 5, response: 0.4 })
 
   return (
     <article className="group flex w-full flex-col rounded-[20px] bg-white p-1.5 shadow-[0_1px_2px_rgba(14,32,24,0.06),0_12px_32px_-16px_rgba(14,32,24,0.22)] sm:p-2">
       <button
         type="button"
+        ref={tilt}
         onClick={() => setQuickView(product.id)}
-        className="relative block aspect-[4/5] overflow-hidden rounded-[14px] bg-white ring-1 ring-gold/35 ring-inset"
+        className="tilt-flat relative block aspect-[4/5] overflow-hidden rounded-[14px] bg-white ring-1 ring-gold/35 ring-inset"
         aria-label={`Quick view: ${product.name}`}
       >
         <ProductImage product={product} className={`zoom-img h-full w-full object-cover ${STUDIO.has(product.id) ? 'scale-[1.18]' : ''}`} />
         <Corners />
+        <span className="tilt-sheen absolute inset-0" aria-hidden />
         <span className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-forest px-2.5 py-0.5 text-[11px] font-medium tracking-wide text-gold-light sm:bottom-3 sm:text-xs">
           {product.size}
         </span>
