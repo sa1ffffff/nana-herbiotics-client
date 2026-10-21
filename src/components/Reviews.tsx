@@ -257,7 +257,7 @@ export function ReviewForm() {
             <button type="submit" disabled={state === 'sending'} className="press h-12 w-full rounded-full bg-forest font-semibold text-ivory hover:bg-forest-deep disabled:opacity-60">
               {state === 'sending' ? 'Sending…' : 'Submit review'}
             </button>
-            <p className="text-center text-xs text-ink/55">Reviews are checked before they appear. We never show your phone or email.</p>
+            <p className="text-center text-xs text-ink/55">Your review appears right away with your name and city. We never ask for your phone or email.</p>
           </form>
         )}
       </div>

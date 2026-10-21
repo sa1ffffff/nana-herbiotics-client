@@ -11,7 +11,7 @@ create table if not exists public.reviews (
   rating      smallint not null check (rating between 1 and 5),
   title       text check (title is null or char_length(title) <= 80),
   body        text not null check (char_length(body) between 10 and 1000),
-  approved    boolean not null default false,
+  approved    boolean not null default true,  -- untick in the dashboard to hide a review
   created_at  timestamptz not null default now()
 );
 
@@ -25,11 +25,11 @@ create policy "read approved reviews" on public.reviews
   for select to anon, authenticated
   using (approved);
 
--- Visitors can submit a review, but it always starts unapproved.
+-- Visitors can submit a review; it is published straight away.
 drop policy if exists "submit review" on public.reviews;
 create policy "submit review" on public.reviews
   for insert to anon, authenticated
-  with check (approved = false);
+  with check (approved = true);
 
--- No update/delete policies: only you (from the dashboard / service role) can approve or remove reviews.
--- To approve: Table Editor > reviews > tick "approved" on the row.
+-- No update/delete policies: only you (from the dashboard) can hide or remove reviews.
+-- To hide one: Table Editor > reviews > untick "approved". To remove: delete the row.

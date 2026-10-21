@@ -56,23 +56,23 @@ async function fetchApproved(): Promise<Review[]> {
   return data as Review[]
 }
 
-async function insert(r: NewReview): Promise<'pending' | 'published'> {
+async function insert(r: NewReview): Promise<'published'> {
   if (!REVIEWS_LIVE) {
     writeLocal([{ ...r, id: crypto.randomUUID(), created_at: new Date().toISOString() }, ...readLocal()])
     return 'published'
   }
   const sb = await client()
-  // RLS only allows unapproved inserts; you approve rows in the Supabase dashboard.
-  const { error } = await sb.from('reviews').insert({ ...r, approved: false })
+  // Published immediately; hide a review later by unticking "approved" in Supabase.
+  const { error } = await sb.from('reviews').insert({ ...r, approved: true })
   if (error) throw error
-  return 'pending'
+  return 'published'
 }
 
 interface ReviewState {
   reviews: Review[]
   status: 'idle' | 'loading' | 'ready' | 'error'
   load: () => Promise<void>
-  submit: (r: NewReview) => Promise<'pending' | 'published'>
+  submit: (r: NewReview) => Promise<'published'>
 }
 
 export const useReviews = create<ReviewState>((set, get) => ({
@@ -89,7 +89,9 @@ export const useReviews = create<ReviewState>((set, get) => ({
   },
   submit: async (r) => {
     const result = await insert(r)
-    if (result === 'published') set({ reviews: readLocal() })
+    // Show it straight away without waiting for a refetch
+    const added: Review = { ...r, id: crypto.randomUUID(), created_at: new Date().toISOString() }
+    set({ reviews: REVIEWS_LIVE ? [added, ...get().reviews] : readLocal() })
     return result
   },
 }))
