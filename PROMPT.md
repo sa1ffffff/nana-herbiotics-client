@@ -18,9 +18,9 @@ The bar is an Awwwards-level site: immersive, 3D and full of motion, but every a
 |---|---|
 | Brand name | **Nana Herbiotics** (use this exact spelling everywhere. It matches the product labels) |
 | Taglines | "Botanical Care, Naturally" (primary) · "Rooted in Nature" (secondary) |
-| Established | 2024 |
+| Established | 2026 |
 | Market | Pakistan. All prices in **PKR**, formatted `Rs 1,599` / `PKR 1,599` |
-| Monogram | Interlocking serif "NH" inside a botanical crest, flanked by "ESTD · 2024" |
+| Monogram | Interlocking serif "NH" inside a botanical crest, flanked by "ESTD · 2026" |
 | Personality | Warm, trustworthy, heritage apothecary, gentle. Not clinical and not "spa-generic". |
 
 ### Visual language (take it from the real labels)
@@ -106,7 +106,7 @@ Store all products in one typed `products.ts` data file (id, slug, name, categor
 2. **Hero (3D)**: full-viewport dark forest scene.
    - A React Three Fiber scene: a hero bottle (Hibiscus Shampoo or Herbal Shampoo) built as a procedural glass/plastic bottle (`LatheGeometry`) wrapped with the real label texture, gold pump cap, slowly rotating. Botanical elements (leaves, hibiscus petals, herb sprigs) drift around it in depth with soft bokeh. Cursor parallax tilts the scene gently.
    - Headline "Botanical Care, Naturally" revealed with a React Bits text effect. Sub-line: *Gentle, paraben-free care made from herbs, flowers and botanical extracts.* "Shop Now" primary button (magnetic on desktop) and a "Our Story" secondary link.
-   - Rotating circular badge: "ROOTED IN NATURE • ESTD 2024 •".
+   - Rotating circular badge: "ROOTED IN NATURE • ESTD 2026 •".
    - On scroll, the bottle travels, scales down and hands off into the Shampoos section (GSAP ScrollTrigger pin).
    - Fallback: if WebGL is unavailable, on low-power devices, or with reduced motion, show a static layered parallax composition using the transparent cutouts.
 
@@ -124,7 +124,7 @@ Store all products in one typed `products.ts` data file (id, slug, name, categor
 
 9. **Ingredients story** (optional, recommended): a horizontal pinned scroll of key botanicals (hibiscus, neem, green tea, chamomile, aloe, rose), each with a one-line benefit.
 
-10. **About**: warm short story: started in 2024 from family herbal recipes; small batches; plants over chemicals; gentle enough for the whole family. Pull-quote in large serif. Monogram crest.
+10. **About**: warm short story: started in 2026 from family herbal recipes; small batches; plants over chemicals; gentle enough for the whole family. Pull-quote in large serif. Monogram crest.
 
 11. **Contact + Footer**: WhatsApp button (`https://wa.me/923307072774`), phone `0330-7072774` (`tel:+923307072774`), email `nanaherbiotics@gmail.com` (`mailto:`), Instagram and Facebook (placeholder links), email contact form (name, email, message), "Cash on Delivery available across Pakistan" note, quick links, © 2026 Nana Herbiotics.
 
@@ -145,7 +145,7 @@ Follow `/emil-design-eng` rules. Concretely:
 
 React Bits components to use (restyled to brand):
 - **SplitText / BlurText**: hero headline and section titles
-- **CircularText**: "Rooted in Nature • Estd 2024" badge
+- **CircularText**: "Rooted in Nature • Estd 2026" badge
 - **ScrollVelocity**: marquee band
 - **Magnet**: Shop Now / checkout CTAs (desktop only)
 - **TiltedCard** or **SpotlightCard**: product cards (subtle, max ~6° tilt)

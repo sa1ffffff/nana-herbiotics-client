@@ -32,7 +32,7 @@ export function Hero() {
       <div className="hero-copy mx-auto w-full max-w-6xl px-5 pb-16 pt-36 md:py-28 lg:py-32">
         {/* Eyebrow */}
         <p className="font-display text-[11px] font-semibold tracking-[0.35em] text-gold uppercase sm:text-[13px]">
-          Est. 2024 · Rooted in Nature
+          Est. 2026 · Rooted in Nature
         </p>
 
         {/* Headline */}
@@ -89,7 +89,7 @@ export function Hero() {
               <path id="badge-circle" d="M60 10 a50 50 0 1 1 -1 0" />
             </defs>
             <text fontSize="11" fontFamily="Cinzel, serif" fontWeight="600" letterSpacing="3" fill="currentColor">
-              <textPath href="#badge-circle">ROOTED IN NATURE • ESTD 2024 •</textPath>
+              <textPath href="#badge-circle">ROOTED IN NATURE • ESTD 2026 •</textPath>
             </text>
           </svg>
         </div>

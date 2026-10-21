@@ -171,7 +171,7 @@ export function Header() {
         </ul>
         <div className="mt-4 px-6 text-center">
           <p className="text-sm text-ivory/50">Botanical Care, Naturally</p>
-          <p className="mt-1 font-display text-xs tracking-[0.2em] text-gold/40 uppercase">ESTD 2024</p>
+          <p className="mt-1 font-display text-xs tracking-[0.2em] text-gold/40 uppercase">ESTD 2026</p>
         </div>
       </nav>
     </header>

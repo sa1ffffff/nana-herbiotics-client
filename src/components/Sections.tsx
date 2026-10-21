@@ -144,7 +144,7 @@ export function About() {
           <Corners className="text-gold/60" size="h-6 w-6" inset="m-2" />
           <div className="text-center">
             <Monogram className="mx-auto h-22 w-22 md:h-28 md:w-28" />
-            <p className="mt-3 font-display text-xs tracking-[0.25em] text-gold/70 uppercase">ESTD · 2024</p>
+            <p className="mt-3 font-display text-xs tracking-[0.25em] text-gold/70 uppercase">ESTD · 2026</p>
           </div>
         </div>
         {/* Story */}
@@ -154,7 +154,7 @@ export function About() {
           <Divider className="mt-4" />
           <div className="mt-6 space-y-5 text-[17px] leading-relaxed text-ink/75">
             <p>
-              Nana Herbiotics started in 2024 with a simple idea: care for your hair and skin the way our grandmothers did,
+              Nana Herbiotics started in 2026 with a simple idea: care for your hair and skin the way our grandmothers did,
               with plants instead of harsh chemicals.
             </p>
             <p>
@@ -297,7 +297,7 @@ export function Footer() {
             <div>
               <p className="font-display text-xl font-semibold">Nana Herbiotics</p>
               <p className="mt-0.5 text-sm text-ivory/50">Botanical Care, Naturally</p>
-              <p className="text-[10px] tracking-[0.2em] text-gold/40 uppercase">Est. 2024 · Handmade in Pakistan</p>
+              <p className="text-[10px] tracking-[0.2em] text-gold/40 uppercase">Est. 2026 · Handmade in Pakistan</p>
             </div>
           </div>
 

@@ -16,11 +16,11 @@ Pakistani shoppers, split roughly equally between people who discover the brand 
 
 ## Product Purpose
 
-The online shop for Nana Herbiotics, a small herbal personal-care brand established in 2024. It presents the range, builds trust in the herbal formulations, and turns a visit into a COD order sent through WhatsApp. Success is a completed order message reaching 0330-7072774.
+The online shop for Nana Herbiotics, a small herbal personal-care brand established in 2026. It presents the range, builds trust in the herbal formulations, and turns a visit into a COD order sent through WhatsApp. Success is a completed order message reaching 0330-7072774.
 
 ## Positioning
 
-Small-batch herbal formulations with a heritage apothecary identity: the products' own illustrated forest-green-and-gold labels (NH monogram crest, "ESTD 2024", "Rooted in Nature") are the brand. Claims printed on labels: paraben free, sulfate free, 100% herbal, safe for all hair types; Herbal Shampoo "infused with 27+ herbs"; Hibiscus Shampoo with hibiscus flowers, Vitamin B12 and Vitamin E.
+Small-batch herbal formulations with a heritage apothecary identity: the products' own illustrated forest-green-and-gold labels (NH monogram crest, "ESTD 2024" printed on the current labels; the brand was founded in 2026, "Rooted in Nature") are the brand. Claims printed on labels: paraben free, sulfate free, 100% herbal, safe for all hair types; Herbal Shampoo "infused with 27+ herbs"; Hibiscus Shampoo with hibiscus flowers, Vitamin B12 and Vitamin E.
 
 ## Operating Context
 
@@ -34,7 +34,7 @@ Orders are Cash on Delivery across Pakistan. No payment gateway and no backend: 
 
 ## Brand Commitments
 
-- Name: **Nana Herbiotics** (label spelling). Taglines "Botanical Care, Naturally" and "Rooted in Nature". Est. 2024.
+- Name: **Nana Herbiotics** (label spelling). Taglines "Botanical Care, Naturally" and "Rooted in Nature". Est. 2026.
 - Visual identity: the label world come to life. Deep forest green and antique gold dominate; product images sit on pure white wells. Chosen by the user over a lighter treatment.
 - Voice: warm, trustworthy, simple; natural ingredients and gentle care.
 
