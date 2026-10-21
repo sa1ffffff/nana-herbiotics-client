@@ -6,10 +6,12 @@ import '@fontsource/playfair-display/latin-700.css'
 import '@fontsource/playfair-display/latin-600-italic.css'
 import '@fontsource-variable/figtree'
 import './index.css'
+import { Analytics } from '@vercel/analytics/react'
 import App from './App'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
+    <Analytics />
   </StrictMode>,
 )
