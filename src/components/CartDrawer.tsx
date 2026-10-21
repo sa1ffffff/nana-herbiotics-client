@@ -185,7 +185,7 @@ function Checkout({ lines, subtotal, onBack }: { lines: CartLine[]; subtotal: nu
             list="nh-cities"
             autoComplete="address-level2"
             aria-invalid={!!errors.city || undefined}
-            className={`h-12 w-full rounded-xl border bg-ivory/40 px-4 outline-none focus:border-forest ${errors.city ? 'border-hibiscus' : 'border-forest/20'}`}
+            className={`h-12 w-full rounded-xl border bg-forest/[0.03] px-4 outline-none focus:border-forest ${errors.city ? 'border-hibiscus' : 'border-forest/20'}`}
           />
           <datalist id="nh-cities">
             {CITIES.map((c) => <option key={c} value={c} />)}
@@ -194,7 +194,7 @@ function Checkout({ lines, subtotal, onBack }: { lines: CartLine[]; subtotal: nu
         </label>
         <label className="block">
           <span className="mb-1.5 block text-sm font-medium text-ink/80">Notes (optional)</span>
-          <textarea name="notes" rows={2} placeholder="Favourite soap design, delivery timing…" className="w-full rounded-xl border border-forest/20 bg-ivory/40 px-4 py-3 outline-none focus:border-forest" />
+          <textarea name="notes" rows={2} placeholder="Favourite soap design, delivery timing…" className="w-full rounded-xl border border-forest/20 bg-forest/[0.03] px-4 py-3 outline-none focus:border-forest" />
         </label>
         <fieldset className="rounded-xl border border-gold/60 bg-gold/10 p-4">
           <legend className="px-1 text-sm font-semibold text-forest">Payment</legend>

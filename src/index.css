@@ -35,8 +35,8 @@ html {
 }
 
 body {
-  background: var(--color-ivory);
-  color: var(--color-ink);
+  background: var(--color-forest);
+  color: var(--color-ivory);
   font-family: var(--font-sans);
   -webkit-tap-highlight-color: transparent;
 }
@@ -74,7 +74,7 @@ textarea {
 }
 
 .engraved {
-  background-color: var(--color-forest);
+  background-color: var(--color-forest-deep);
   background-image: radial-gradient(color-mix(in srgb, var(--color-gold) 9%, transparent) 1px, transparent 1px);
   background-size: 22px 22px;
 }

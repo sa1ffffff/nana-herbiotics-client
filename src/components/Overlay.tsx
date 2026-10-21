@@ -67,8 +67,8 @@ export function Overlay({ open, onClose, label, variant, children }: Props) {
         tabIndex={-1}
         className={
           drawer
-            ? `absolute inset-y-0 right-0 flex w-full max-w-md flex-col bg-ivory shadow-2xl outline-none transition-transform duration-300 ease-[var(--ease-drawer)] ${shown ? 'translate-x-0' : 'translate-x-full'}`
-            : `absolute inset-x-0 bottom-0 max-h-[92dvh] overflow-y-auto rounded-t-3xl bg-white outline-none transition-[transform,opacity] duration-250 ease-[var(--ease-out)] sm:inset-auto sm:left-1/2 sm:top-1/2 sm:w-[min(880px,calc(100vw-32px))] sm:rounded-3xl ${shown ? 'translate-y-0 opacity-100 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:scale-100' : 'translate-y-8 opacity-0 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:scale-[0.96]'}`
+            ? `absolute inset-y-0 right-0 flex w-full max-w-md flex-col bg-white text-ink shadow-2xl outline-none transition-transform duration-300 ease-[var(--ease-drawer)] ${shown ? 'translate-x-0' : 'translate-x-full'}`
+            : `absolute inset-x-0 bottom-0 max-h-[92dvh] overflow-y-auto rounded-t-3xl bg-white text-ink outline-none transition-[transform,opacity] duration-250 ease-[var(--ease-out)] sm:inset-auto sm:left-1/2 sm:top-1/2 sm:w-[min(880px,calc(100vw-32px))] sm:rounded-3xl ${shown ? 'translate-y-0 opacity-100 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:scale-100' : 'translate-y-8 opacity-0 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:scale-[0.96]'}`
         }
       >
         {children}

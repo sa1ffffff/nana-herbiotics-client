@@ -31,9 +31,9 @@ function useReveal<T extends HTMLElement>() {
 function SectionHead({ title, intro }: { title: string; intro: string }) {
   return (
     <div className="mx-auto mb-10 max-w-xl text-center">
-      <h2 className="font-display text-[clamp(1.75rem,4.5vw,2.5rem)] font-bold leading-tight text-forest">{title}</h2>
+      <h2 className="font-display text-[clamp(1.75rem,4.5vw,2.5rem)] font-bold leading-tight text-ivory">{title}</h2>
       <Divider className="mt-3 justify-center" />
-      <p className="mt-4 text-[17px] leading-relaxed text-pretty text-ink/75">{intro}</p>
+      <p className="mt-4 text-[17px] leading-relaxed text-pretty text-ivory/75">{intro}</p>
     </div>
   )
 }
@@ -45,7 +45,7 @@ export function ProductSection({ id, category, title, intro, tone = 'ivory' }: {
   const items = inCategory(category)
   const cols = items.length === 2 ? 'grid-cols-2 mx-auto max-w-4xl' : 'grid-cols-2 lg:grid-cols-3'
   return (
-    <section id={id} className={tone === 'white' ? 'bg-white/60' : ''}>
+    <section id={id} className={tone === 'white' ? 'bg-forest-soft/40' : ''}>
       <div ref={ref} className="reveal mx-auto max-w-6xl px-4 py-14 md:py-20">
         <SectionHead title={title} intro={intro} />
         <div className={`stagger grid gap-3 sm:gap-6 ${cols}`}>
@@ -70,7 +70,7 @@ const PROMISES: { icon: ReactNode; title: string; text: string }[] = [
 export function Promises() {
   const ref = useReveal<HTMLDivElement>()
   return (
-    <section className="engraved text-ivory" aria-labelledby="why">
+    <section className="engraved border-y border-gold/15 text-ivory" aria-labelledby="why">
       <div ref={ref} className="reveal mx-auto max-w-6xl px-4 py-14 md:py-20">
         <h2 id="why" className="text-center font-display text-[clamp(1.75rem,4.5vw,2.5rem)] font-bold text-ivory">
           Why Nana Herbiotics
@@ -94,7 +94,7 @@ export function Promises() {
 export function About() {
   const ref = useReveal<HTMLDivElement>()
   return (
-    <section id="about" className="bg-white/60">
+    <section id="about" className="bg-forest-soft/40">
       <div ref={ref} className="reveal mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 md:grid-cols-[auto_1fr] md:gap-16 md:py-20">
         <div className="relative mx-auto grid h-52 w-44 place-items-center rounded-2xl bg-forest text-gold-light label-frame md:h-64 md:w-56">
           <Corners className="text-gold/60" size="h-6 w-6" inset="m-2" />
@@ -104,9 +104,9 @@ export function About() {
           </div>
         </div>
         <div className="max-w-2xl">
-          <h2 className="font-display text-[clamp(1.75rem,4.5vw,2.5rem)] font-bold leading-tight text-forest">Rooted in nature</h2>
+          <h2 className="font-display text-[clamp(1.75rem,4.5vw,2.5rem)] font-bold leading-tight text-ivory">Rooted in nature</h2>
           <Divider className="mt-3" />
-          <div className="mt-5 space-y-4 text-[17px] leading-relaxed text-ink/80">
+          <div className="mt-5 space-y-4 text-[17px] leading-relaxed text-ivory/80">
             <p>
               Nana Herbiotics started in 2024 with a simple idea: care for your hair and skin the way our grandmothers did,
               with plants instead of harsh chemicals.
@@ -115,7 +115,7 @@ export function About() {
               We make our shampoos, washes, serum and handmade soaps in small batches, using herbs, flowers and botanical
               extracts. Every formula is paraben free and gentle enough for the whole family.
             </p>
-            <p className="font-display text-lg text-forest">Botanical care, naturally.</p>
+            <p className="font-display text-lg text-gold-light">Botanical care, naturally.</p>
           </div>
         </div>
       </div>
@@ -129,9 +129,9 @@ export function Contact() {
     <section id="contact">
       <div ref={ref} className="reveal mx-auto grid max-w-6xl gap-10 px-4 py-14 md:grid-cols-2 md:py-20">
         <div>
-          <h2 className="font-display text-[clamp(1.75rem,4.5vw,2.5rem)] font-bold leading-tight text-forest">Get in touch</h2>
+          <h2 className="font-display text-[clamp(1.75rem,4.5vw,2.5rem)] font-bold leading-tight text-ivory">Get in touch</h2>
           <Divider className="mt-3" />
-          <p className="mt-4 mb-8 max-w-md text-[17px] leading-relaxed text-ink/75">Questions about a product, or want to order by message? We usually reply the same day.</p>
+          <p className="mt-4 mb-8 max-w-md text-[17px] leading-relaxed text-ivory/75">Questions about a product, or want to order by message? We usually reply the same day.</p>
           <div className="flex flex-col gap-3">
             <a
               href={waLink('Assalam-o-Alaikum! I have a question about Nana Herbiotics products.')}
@@ -141,13 +141,13 @@ export function Contact() {
             >
               <WhatsAppIcon width={20} height={20} /> Chat on WhatsApp
             </a>
-            <a href={`tel:${PHONE_TEL}`} className="inline-flex items-center gap-3 py-2 text-forest hover:underline">
+            <a href={`tel:${PHONE_TEL}`} className="inline-flex items-center gap-3 py-2 text-ivory hover:underline">
               <PhoneIcon width={20} height={20} className="text-gold" /> {PHONE_DISPLAY}
             </a>
-            <a href={`mailto:${EMAIL}`} className="inline-flex items-center gap-3 py-2 break-all text-forest hover:underline">
+            <a href={`mailto:${EMAIL}`} className="inline-flex items-center gap-3 py-2 break-all text-ivory hover:underline">
               <MailIcon width={20} height={20} className="shrink-0 text-gold" /> {EMAIL}
             </a>
-            <p className="mt-2 inline-flex items-center gap-3 rounded-xl bg-forest/5 px-4 py-3 text-[15px] text-forest">
+            <p className="mt-2 inline-flex items-center gap-3 rounded-xl border border-gold/20 bg-white/5 px-4 py-3 text-[15px] text-ivory">
               <TruckIcon width={20} height={20} className="shrink-0 text-gold" />
               Cash on Delivery available across Pakistan
             </p>
@@ -162,7 +162,7 @@ export function Contact() {
 function ContactForm() {
   return (
     <form
-      className="rounded-2xl bg-white p-5 shadow-[0_8px_24px_-12px_rgba(14,32,24,0.18)] sm:p-6"
+      className="rounded-2xl bg-white p-5 text-ink shadow-[0_8px_24px_-12px_rgba(14,32,24,0.18)] sm:p-6"
       onSubmit={(e) => {
         e.preventDefault()
         const f = new FormData(e.currentTarget)
@@ -177,7 +177,7 @@ function ContactForm() {
         <Field label="Email" name="email" type="email" autoComplete="email" />
         <label className="block">
           <span className="mb-1.5 block text-sm font-medium text-ink/80">Message</span>
-          <textarea name="message" required rows={4} className="w-full rounded-xl border border-forest/20 bg-ivory/40 px-4 py-3 outline-none focus:border-forest" />
+          <textarea name="message" required rows={4} className="w-full rounded-xl border border-forest/20 bg-forest/[0.03] px-4 py-3 outline-none focus:border-forest" />
         </label>
       </div>
       <button type="submit" className="press mt-5 h-12 w-full rounded-full bg-forest font-semibold text-ivory hover:bg-forest-deep">
@@ -196,7 +196,7 @@ export function Field({ label, error, ...rest }: React.InputHTMLAttributes<HTMLI
         required
         {...rest}
         aria-invalid={!!error || undefined}
-        className={`h-12 w-full rounded-xl border bg-ivory/40 px-4 outline-none focus:border-forest ${error ? 'border-hibiscus' : 'border-forest/20'}`}
+        className={`h-12 w-full rounded-xl border bg-forest/[0.03] px-4 outline-none focus:border-forest ${error ? 'border-hibiscus' : 'border-forest/20'}`}
       />
       {error && <span className="mt-1 block text-sm text-hibiscus">{error}</span>}
     </label>

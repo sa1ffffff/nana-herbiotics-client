@@ -50,7 +50,7 @@ export function ProductCard({ product }: { product: Product }) {
   const tilt = useTilt<HTMLButtonElement>({ max: 5, response: 0.4 })
 
   return (
-    <article className="group flex w-full flex-col rounded-[20px] bg-white p-1.5 shadow-[0_1px_2px_rgba(14,32,24,0.06),0_12px_32px_-16px_rgba(14,32,24,0.22)] sm:p-2">
+    <article className="group flex w-full flex-col rounded-[20px] bg-white text-ink p-1.5 shadow-[0_1px_2px_rgba(14,32,24,0.06),0_12px_32px_-16px_rgba(14,32,24,0.22)] sm:p-2">
       <button
         type="button"
         ref={tilt}
