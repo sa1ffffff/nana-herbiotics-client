@@ -1,6 +1,7 @@
 import { byId } from '../data/products'
 import { ProductImage } from './ProductImage'
 import { LeafIcon, TruckIcon } from './Icons'
+import { Corners } from './Ornaments'
 
 const trio = ['herbal-shampoo', 'hibiscus-shampoo', 'herbal-conditioner'].map((id) => byId(id)!)
 
@@ -36,18 +37,19 @@ export function Hero() {
         </div>
 
         <div className="label-frame relative mx-auto w-full max-w-[22rem] overflow-hidden rounded-t-[999px] rounded-b-3xl bg-white px-3 pt-10 md:max-w-md">
-          <div className="grid grid-cols-3 items-end gap-1">
+          <Corners className="text-gold/70" />
+          <div className="grid grid-cols-3 items-end">
             {trio.map((p, i) => (
               <ProductImage
                 key={p.id}
                 product={p}
                 eager
                 sizes="(min-width: 768px) 160px, 30vw"
-                className={`aspect-[2/5] w-full object-cover ${i === 1 ? '' : 'origin-bottom scale-90'}`}
+                className={`aspect-[1/2] w-full object-cover ${i === 1 ? '' : 'origin-bottom scale-90'}`}
               />
             ))}
           </div>
-          <p className="flex items-center justify-center gap-2 py-3 text-center font-display text-sm font-semibold tracking-wider text-forest">
+          <p className="relative flex items-center justify-center gap-2 py-3 text-center font-display text-sm font-semibold tracking-wider text-forest">
             <LeafIcon width={16} height={16} className="text-gold" /> Rooted in Nature · Est. 2024
           </p>
         </div>

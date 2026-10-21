@@ -3,6 +3,7 @@ import { inCategory, type Category } from '../data/products'
 import { EMAIL, FACEBOOK_URL, INSTAGRAM_URL, PHONE_DISPLAY, PHONE_TEL, waLink } from '../lib/shop'
 import { ProductCard } from './ProductCard'
 import { Monogram } from './Header'
+import { Corners, Divider } from './Ornaments'
 import {
   DropIcon, FacebookIcon, FlaskIcon, HeartIcon, InstagramIcon, MailIcon, PhoneIcon, SproutIcon, TruckIcon, WhatsAppIcon,
 } from './Icons'
@@ -29,10 +30,10 @@ function useReveal<T extends HTMLElement>() {
 
 function SectionHead({ title, intro }: { title: string; intro: string }) {
   return (
-    <div className="mb-8 max-w-2xl">
+    <div className="mx-auto mb-10 max-w-xl text-center">
       <h2 className="font-display text-[clamp(1.75rem,4.5vw,2.5rem)] font-bold leading-tight text-forest">{title}</h2>
-      <div className="mt-3 h-px w-16 bg-gold" />
-      <p className="mt-4 text-[17px] leading-relaxed text-ink/75">{intro}</p>
+      <Divider className="mt-3 justify-center" />
+      <p className="mt-4 text-[17px] leading-relaxed text-pretty text-ink/75">{intro}</p>
     </div>
   )
 }
@@ -42,14 +43,16 @@ export function ProductSection({ id, category, title, intro, tone = 'ivory' }: {
 }) {
   const ref = useReveal<HTMLDivElement>()
   const items = inCategory(category)
-  const cols = items.length === 2 ? 'grid-cols-2 lg:max-w-4xl' : 'grid-cols-2 lg:grid-cols-3'
+  const cols = items.length === 2 ? 'grid-cols-2 mx-auto max-w-4xl' : 'grid-cols-2 lg:grid-cols-3'
   return (
     <section id={id} className={tone === 'white' ? 'bg-white/60' : ''}>
       <div ref={ref} className="reveal mx-auto max-w-6xl px-4 py-14 md:py-20">
         <SectionHead title={title} intro={intro} />
-        <div className={`grid gap-3 sm:gap-5 ${cols}`}>
-          {items.map((p) => (
-            <ProductCard key={p.id} product={p} />
+        <div className={`stagger grid gap-3 sm:gap-6 ${cols}`}>
+          {items.map((p, i) => (
+            <div key={p.id} style={{ '--i': i } as React.CSSProperties} className="flex">
+              <ProductCard product={p} />
+            </div>
           ))}
         </div>
       </div>
@@ -93,7 +96,8 @@ export function About() {
   return (
     <section id="about" className="bg-white/60">
       <div ref={ref} className="reveal mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 md:grid-cols-[auto_1fr] md:gap-16 md:py-20">
-        <div className="label-frame mx-auto grid h-44 w-44 place-items-center rounded-full bg-forest text-gold-light md:h-56 md:w-56">
+        <div className="relative mx-auto grid h-52 w-44 place-items-center rounded-2xl bg-forest text-gold-light label-frame md:h-64 md:w-56">
+          <Corners className="text-gold/60" size="h-6 w-6" inset="m-2" />
           <div className="text-center">
             <Monogram className="mx-auto h-20 w-20 md:h-24 md:w-24" />
             <p className="mt-2 font-display text-xs tracking-[0.2em]">ESTD · 2024</p>
@@ -101,7 +105,7 @@ export function About() {
         </div>
         <div className="max-w-2xl">
           <h2 className="font-display text-[clamp(1.75rem,4.5vw,2.5rem)] font-bold leading-tight text-forest">Rooted in nature</h2>
-          <div className="mt-3 h-px w-16 bg-gold" />
+          <Divider className="mt-3" />
           <div className="mt-5 space-y-4 text-[17px] leading-relaxed text-ink/80">
             <p>
               Nana Herbiotics started in 2024 with a simple idea: care for your hair and skin the way our grandmothers did,
@@ -125,7 +129,9 @@ export function Contact() {
     <section id="contact">
       <div ref={ref} className="reveal mx-auto grid max-w-6xl gap-10 px-4 py-14 md:grid-cols-2 md:py-20">
         <div>
-          <SectionHead title="Get in touch" intro="Questions about a product, or want to order by message? We usually reply the same day." />
+          <h2 className="font-display text-[clamp(1.75rem,4.5vw,2.5rem)] font-bold leading-tight text-forest">Get in touch</h2>
+          <Divider className="mt-3" />
+          <p className="mt-4 mb-8 max-w-md text-[17px] leading-relaxed text-ink/75">Questions about a product, or want to order by message? We usually reply the same day.</p>
           <div className="flex flex-col gap-3">
             <a
               href={waLink('Assalam-o-Alaikum! I have a question about Nana Herbiotics products.')}

@@ -86,6 +86,14 @@ textarea {
 .reveal.in {
   transform: none;
 }
+.reveal .stagger > * {
+  transform: translateY(18px);
+  transition: transform 550ms var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 60ms);
+}
+.reveal.in .stagger > * {
+  transform: none;
+}
 
 @media (hover: hover) and (pointer: fine) {
   .zoom-img {

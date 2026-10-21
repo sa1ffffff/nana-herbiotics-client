@@ -69,7 +69,7 @@ export const products: Product[] = [
     ingredients: ['Botanical extracts'],
     badges: ['Paraben free', 'Gentle daily use'],
     image: img('herbal-face-wash'),
-    alt: 'Nana Herbiotics Herbal Face Wash, 150 ml clear pump bottle with a green and gold label',
+    alt: 'Nana Herbiotics Herbal Face Wash, 150 ml blue-tinted pump bottle with a green and gold label',
   },
   {
     id: 'herbal-body-wash',
@@ -82,7 +82,7 @@ export const products: Product[] = [
     ingredients: ['Chamomile', 'Green tea', 'Neem'],
     badges: ['Paraben free', 'All skin types'],
     image: img('herbal-body-wash'),
-    alt: 'Nana Herbiotics Herbal Body Wash, 300 ml clear bottle of green gel with a dark label',
+    alt: 'Nana Herbiotics Herbal Body Wash, 300 ml clear bottle of green gel with a green and gold label',
   },
   {
     id: 'brightening-serum',
