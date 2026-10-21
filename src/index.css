@@ -1,0 +1,97 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-forest: #173326;
+  --color-forest-deep: #0e2018;
+  --color-forest-soft: #21443a;
+  --color-gold: #c8a24a;
+  --color-gold-light: #e9d49a;
+  --color-ivory: #f6f1e6;
+  --color-ink: #1b2620;
+  --color-hibiscus: #c23a5c;
+  --font-display: 'Cinzel', Georgia, serif;
+  --font-sans: 'Figtree Variable', system-ui, sans-serif;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 72px;
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+  }
+}
+
+body {
+  background: var(--color-ivory);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: var(--color-gold-light);
+  color: var(--color-forest-deep);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+input,
+select,
+textarea {
+  font-size: 16px;
+}
+
+/* Press feedback for anything tappable */
+.press {
+  transition: transform 160ms var(--ease-out), background-color 160ms ease, color 160ms ease;
+}
+.press:active {
+  transform: scale(0.97);
+}
+
+/* Gold double rule used as the label frame */
+.label-frame {
+  border: 1px solid color-mix(in srgb, var(--color-gold) 70%, transparent);
+  outline: 1px solid color-mix(in srgb, var(--color-gold) 35%, transparent);
+  outline-offset: 5px;
+}
+
+.engraved {
+  background-color: var(--color-forest);
+  background-image: radial-gradient(color-mix(in srgb, var(--color-gold) 9%, transparent) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* One quiet reveal as sections come in */
+.reveal {
+  transform: translateY(14px);
+  transition: transform 500ms var(--ease-out);
+}
+.reveal.in {
+  transform: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .zoom-img {
+    transition: transform 400ms var(--ease-out);
+  }
+  .group:hover .zoom-img {
+    transform: scale(1.04);
+  }
+}
