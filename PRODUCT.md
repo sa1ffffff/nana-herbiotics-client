@@ -24,7 +24,7 @@ Small-batch herbal formulations with a heritage apothecary identity: the product
 
 ## Operating Context
 
-Orders are Cash on Delivery across Pakistan. No payment gateway and no backend: checkout composes a WhatsApp message to +92 330 7072774. Delivery is a flat Rs 250, free on orders over Rs 3,000. Contact: hussainmahad786@gmail.com, phone/WhatsApp 0330-7072774.
+Orders are Cash on Delivery across Pakistan. No payment gateway and no backend: checkout composes a WhatsApp message to +92 330 7072774. Delivery is a flat Rs 250, free on orders over Rs 3,000. Contact: nanaherbiotics@gmail.com, phone/WhatsApp 0330-7072774.
 
 ## Capabilities and Constraints
 

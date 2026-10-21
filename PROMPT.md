@@ -126,7 +126,7 @@ Store all products in one typed `products.ts` data file (id, slug, name, categor
 
 10. **About**: warm short story: started in 2024 from family herbal recipes; small batches; plants over chemicals; gentle enough for the whole family. Pull-quote in large serif. Monogram crest.
 
-11. **Contact + Footer**: WhatsApp button (`https://wa.me/923307072774`), phone `0330-7072774` (`tel:+923307072774`), email `hussainmahad786@gmail.com` (`mailto:`), Instagram and Facebook (placeholder links), email contact form (name, email, message), "Cash on Delivery available across Pakistan" note, quick links, © 2026 Nana Herbiotics.
+11. **Contact + Footer**: WhatsApp button (`https://wa.me/923307072774`), phone `0330-7072774` (`tel:+923307072774`), email `nanaherbiotics@gmail.com` (`mailto:`), Instagram and Facebook (placeholder links), email contact form (name, email, message), "Cash on Delivery available across Pakistan" note, quick links, © 2026 Nana Herbiotics.
 
 Floating: back-to-top button (appears after 1 viewport, shows scroll progress ring) and a floating WhatsApp chat button on mobile.
 
@@ -194,14 +194,14 @@ Don't stack effects. Each section gets one signature motion.
 
 | | |
 |---|---|
-| Email | hussainmahad786@gmail.com |
+| Email | nanaherbiotics@gmail.com |
 | Phone | 0330-7072774 (`+92 330 7072774`) |
 | WhatsApp | Same number: `https://wa.me/923307072774` (all "Order on WhatsApp" and chat buttons use this) |
 
 ## 10. Placeholders to fill before launch
 
 - Instagram / Facebook URLs
-- Formspree ID for the contact form (submissions go to hussainmahad786@gmail.com)
+- Formspree ID for the contact form (submissions go to nanaherbiotics@gmail.com)
 - Delivery charge (flat rate? free above a threshold?)
 - Confirmed ingredients for face wash, body wash, serum, soaps
 - Soap design names (or keep the suggested ones)
