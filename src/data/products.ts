@@ -95,7 +95,7 @@ export const products: Product[] = [
     ingredients: ['Rose', 'Botanical extracts'],
     badges: ['Radiant', 'Even tone', 'Healthy glow'],
     image: img('brightening-serum'),
-    alt: 'Nana Herbiotics Brightening Serum, 50 ml black dropper bottle with a rose on the label',
+    alt: 'Nana Herbiotics Brightening Serum, 50 ml matte black dropper bottle with a rose on the green and gold label',
   },
   {
     id: 'acne-soap',
