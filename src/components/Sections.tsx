@@ -313,7 +313,7 @@ export function Footer() {
 
           {/* Social links */}
           <div className="flex gap-3">
-            <a href={INSTAGRAM_URL} aria-label="Instagram" className="press grid h-12 w-12 place-items-center rounded-full border border-gold/20 text-ivory/60 transition-all hover:border-gold/50 hover:text-gold-light hover:bg-gold/[0.06]">
+            <a href={INSTAGRAM_URL} target="_blank" rel="noopener" aria-label="Instagram" className="press grid h-12 w-12 place-items-center rounded-full border border-gold/20 text-ivory/60 transition-all hover:border-gold/50 hover:text-gold-light hover:bg-gold/[0.06]">
               <InstagramIcon width={20} height={20} />
             </a>
             <a href={FACEBOOK_URL} aria-label="Facebook" className="press grid h-12 w-12 place-items-center rounded-full border border-gold/20 text-ivory/60 transition-all hover:border-gold/50 hover:text-gold-light hover:bg-gold/[0.06]">

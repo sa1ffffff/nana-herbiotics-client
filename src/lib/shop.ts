@@ -2,7 +2,7 @@ export const WHATSAPP_NUMBER = '923307072774'
 export const PHONE_DISPLAY = '0330-7072774'
 export const PHONE_TEL = '+923307072774'
 export const EMAIL = 'nanaherbiotics@gmail.com'
-export const INSTAGRAM_URL = '#' // TODO: real Instagram profile
+export const INSTAGRAM_URL = 'https://www.instagram.com/nanaherbiotics/'
 export const FACEBOOK_URL = '#' // TODO: real Facebook page
 
 export const DELIVERY_FEE = 250
