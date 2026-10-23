@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { byId } from '../data/products'
+import { useAdminProducts } from '../store/admin-products'
 import { formatPKR } from '../lib/shop'
 import { useCart } from '../store/cart'
 import { CloseIcon } from './Icons'
@@ -15,9 +16,10 @@ export function QuickView() {
   const add = useCart((s) => s.add)
   const [qty, setQty] = useState(1)
   const showReviewForm = useReviewForm((s) => s.show)
+  const adminProducts = useAdminProducts((s) => s.products)
   const [lastId, setLastId] = useState(id)
   if (id && id !== lastId) setLastId(id)
-  const product = byId(id ?? lastId ?? '')
+  const product = byId(id ?? lastId ?? '', adminProducts)
 
   useEffect(() => setQty(1), [id])
 

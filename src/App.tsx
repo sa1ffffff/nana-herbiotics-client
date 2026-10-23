@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { CartDrawer } from './components/CartDrawer'
 import { Header } from './components/Header'
 import { Hero } from './components/Hero'
@@ -7,6 +7,13 @@ import { QuickView } from './components/QuickView'
 import { ReviewForm, Reviews } from './components/Reviews'
 import { About, Contact, Footer, MarqueeBand, ProductSection, Promises } from './components/Sections'
 import { useCart } from './store/cart'
+import { useAuth } from './store/auth'
+import { AdminLogin } from './components/AdminLogin'
+import { useAdminProducts } from './store/admin-products'
+
+// The admin dashboard (and the xlsx export library it pulls in) is heavy and only
+// ever rendered for the two admin accounts, so it ships as its own chunk.
+const AdminPanel = lazy(() => import('./components/AdminPanel').then((m) => ({ default: m.AdminPanel })))
 
 function Toast() {
   const toast = useCart((s) => s.toast)
@@ -94,7 +101,7 @@ function BackToTop() {
   )
 }
 
-export default function App() {
+function PublicSite() {
   return (
     <>
       <a href="#shampoos" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-gold focus:px-4 focus:py-2 focus:text-forest-deep focus:font-semibold">
@@ -119,6 +126,94 @@ export default function App() {
       <ReviewForm />
       <Toast />
       <BackToTop />
+      <AdminLogin />
+    </>
+  )
+}
+
+export default function App() {
+  const { user, isAdmin, loading, init, setShowLogin } = useAuth()
+  const [page, setPage] = useState<'public' | 'admin'>('public')
+
+  // Initialize auth on mount
+  useEffect(() => { init() }, [init])
+
+  // Admin-added products are shared across every visitor, so everyone loads them,
+  // not only the admin.
+  const loadAdminProducts = useAdminProducts((s) => s.load)
+  useEffect(() => { loadAdminProducts() }, [loadAdminProducts])
+
+  // Auto-redirect to admin if admin user
+  useEffect(() => {
+    if (isAdmin) setPage('admin')
+    else setPage('public')
+  }, [isAdmin])
+
+  // Handle hash-based routing
+  useEffect(() => {
+    const handleHash = () => {
+      if (window.location.hash === '#admin') {
+        if (isAdmin) {
+          setPage('admin')
+        } else {
+          setShowLogin(true)
+        }
+      }
+    }
+    window.addEventListener('hashchange', handleHash)
+    if (window.location.hash === '#admin') {
+      if (isAdmin) setPage('admin')
+      else setShowLogin(true)
+    }
+    return () => window.removeEventListener('hashchange', handleHash)
+  }, [isAdmin, setShowLogin])
+
+  if (loading) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-forest-deep">
+        <div className="text-center">
+          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-gold/30 border-t-gold" />
+          <p className="mt-4 font-display text-ivory/60">Loading…</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (page === 'admin' && isAdmin) {
+    return (
+      <Suspense
+        fallback={
+          <div className="grid min-h-screen place-items-center bg-forest-deep">
+            <div className="h-12 w-12 animate-spin rounded-full border-4 border-gold/30 border-t-gold" />
+          </div>
+        }
+      >
+        <AdminPanel onViewSite={() => setPage('public')} />
+      </Suspense>
+    )
+  }
+
+  return (
+    <>
+      {isAdmin && (
+        <aside
+          aria-label="Admin bar"
+          className="sticky top-0 z-50 flex h-10 items-center justify-between border-b border-gold/30 bg-forest-deep/95 px-4 text-xs text-gold-light backdrop-blur-md"
+        >
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" />
+            <span className="font-medium">Admin: <span className="text-ivory">{user?.email}</span></span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setPage('admin')}
+            className="press flex items-center gap-1 rounded-full bg-gold/20 px-3 py-1 font-semibold text-gold-light transition-colors hover:bg-gold/30"
+          >
+            Go to Admin Dashboard &rarr;
+          </button>
+        </aside>
+      )}
+      <PublicSite />
     </>
   )
 }

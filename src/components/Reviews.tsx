@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { create } from 'zustand'
-import { byId, products } from '../data/products'
+import { byId, getAllProducts, type Product } from '../data/products'
+import { useAdminProducts } from '../store/admin-products'
 import { REVIEWS_LIVE, summarize, useReviews, type Review } from '../lib/reviews'
 import { CloseIcon } from './Icons'
 import { Overlay } from './Overlay'
@@ -18,7 +19,8 @@ export const useReviewForm = create<{ open: boolean; productId: string; show: (p
 const dateFmt = new Intl.DateTimeFormat('en-PK', { day: 'numeric', month: 'short', year: 'numeric' })
 
 function ReviewCard({ r }: { r: Review }) {
-  const product = byId(r.product_id)
+  const adminProducts = useAdminProducts((s) => s.products)
+  const product = byId(r.product_id, adminProducts)
   return (
     <article className="flex h-full flex-col gap-3 rounded-2xl border border-gold/20 bg-forest-soft/40 p-5 text-ivory">
       <div className="flex items-center justify-between gap-3">
@@ -42,6 +44,8 @@ export function Reviews() {
   const ref = useReveal<HTMLDivElement>()
   const { reviews, status, load } = useReviews()
   const show = useReviewForm((s) => s.show)
+  const adminProducts = useAdminProducts((s) => s.products)
+  const allProducts = getAllProducts(adminProducts)
   const [filter, setFilter] = useState('all')
   const [limit, setLimit] = useState(6)
 
@@ -100,7 +104,7 @@ export function Reviews() {
           {/* List */}
           <div>
             <div className="mb-5 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]" role="tablist" aria-label="Filter reviews by product">
-              {[{ id: 'all', name: 'All products' }, ...products.filter((p) => reviewed.has(p.id))].map((p) => (
+              {[{ id: 'all', name: 'All products' }, ...allProducts.filter((p) => reviewed.has(p.id))].map((p) => (
                 <button
                   key={p.id}
                   type="button"
@@ -154,6 +158,8 @@ interface Errors { product?: string; rating?: string; name?: string; body?: stri
 export function ReviewForm() {
   const { open, productId, hide } = useReviewForm()
   const submit = useReviews((s) => s.submit)
+  const adminProducts = useAdminProducts((s) => s.products)
+  const allProducts = getAllProducts(adminProducts)
   const [rating, setRating] = useState(0)
   const [errors, setErrors] = useState<Errors>({})
   const [state, setState] = useState<'form' | 'sending' | 'pending' | 'published'>('form')
@@ -207,7 +213,7 @@ export function ReviewForm() {
                 rating,
               }
               const err: Errors = {}
-              if (!byId(data.product_id)) err.product = 'Please choose the product you used.'
+              if (!byId(data.product_id, adminProducts)) err.product = 'Please choose the product you used.'
               if (!rating) err.rating = 'Please tap a star to rate.'
               if (data.name.length < 2) err.name = 'Please enter your name.'
               if (data.body.length < 10) err.body = 'Please write at least a sentence (10 characters).'
@@ -226,7 +232,7 @@ export function ReviewForm() {
               <span className="mb-1.5 block text-sm font-medium text-ink/80">Product</span>
               <select name="product" defaultValue={productId} aria-invalid={!!errors.product || undefined} className={`h-12 ${inputCls(errors.product)}`}>
                 <option value="" disabled>Choose a product</option>
-                {products.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                {allProducts.map((p: Product) => <option key={p.id} value={p.id}>{p.name}</option>)}
               </select>
               {errors.product && <span className="mt-1 block text-sm text-hibiscus">{errors.product}</span>}
             </label>

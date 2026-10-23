@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useCart, useCartCount } from '../store/cart'
+import { useAuth } from '../store/auth'
 import { CartIcon, CloseIcon, MenuIcon } from './Icons'
 
 export const NAV = [
@@ -29,6 +30,7 @@ export function Header() {
   const count = useCartCount()
   const setOpen = useCart((s) => s.setOpen)
   const toast = useCart((s) => s.toast)
+  const { isAdmin, setShowLogin } = useAuth()
   const [menu, setMenu] = useState(false)
   const [bump, setBump] = useState(false)
   const [scrolled, setScrolled] = useState(false)
@@ -114,6 +116,28 @@ export function Header() {
 
         {/* Actions */}
         <div className="flex items-center gap-1">
+          {!isAdmin && (
+            <button
+              type="button"
+              onClick={() => setShowLogin(true)}
+              className="press grid h-12 w-12 place-items-center rounded-full transition-colors hover:bg-white/10"
+              aria-label="Admin login"
+              title="Admin login"
+            >
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+            </button>
+          )}
+          {isAdmin && (
+            <a
+              href="#admin"
+              className="press hidden items-center gap-1.5 rounded-full bg-gold/20 px-3.5 py-1.5 text-xs font-semibold text-gold-light transition-colors hover:bg-gold/30 sm:flex"
+            >
+              Admin
+            </a>
+          )}
           <button
             type="button"
             onClick={() => setOpen(true)}
@@ -170,7 +194,25 @@ export function Header() {
           ))}
         </ul>
         <div className="mt-4 px-6 text-center">
-          <p className="text-sm text-ivory/50">Botanical Care, Naturally</p>
+          <button
+            type="button"
+            onClick={() => {
+              setMenu(false)
+              if (isAdmin) {
+                window.location.hash = 'admin'
+              } else {
+                setShowLogin(true)
+              }
+            }}
+            className="inline-flex items-center gap-1.5 rounded-full border border-gold/30 px-4 py-1.5 text-xs font-semibold text-gold-light hover:bg-gold/10"
+          >
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            {isAdmin ? 'Admin Dashboard' : 'Admin Portal'}
+          </button>
+          <p className="mt-3 text-sm text-ivory/50">Botanical Care, Naturally</p>
           <p className="mt-1 font-display text-xs tracking-[0.2em] text-gold/40 uppercase">ESTD 2026</p>
         </div>
       </nav>

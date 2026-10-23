@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { SUPABASE_CONFIGURED, supabase } from './supabaseClient'
 
 export interface Review {
   id: string
@@ -13,20 +14,8 @@ export interface Review {
 
 export type NewReview = Omit<Review, 'id' | 'created_at'>
 
-const URL = import.meta.env.VITE_SUPABASE_URL as string | undefined
-const KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
-
 /** True once Supabase env vars are set. Without them reviews live in this browser only. */
-export const REVIEWS_LIVE = Boolean(URL && KEY)
-
-// Loaded on demand so the Supabase client never weighs down the first paint.
-let clientPromise: Promise<import('@supabase/supabase-js').SupabaseClient> | null = null
-function client() {
-  clientPromise ??= import('@supabase/supabase-js').then(({ createClient }) =>
-    createClient(URL!, KEY!, { auth: { persistSession: false } }),
-  )
-  return clientPromise
-}
+export const REVIEWS_LIVE = SUPABASE_CONFIGURED
 
 const LOCAL_KEY = 'nh-reviews-local'
 function readLocal(): Review[] {
@@ -46,7 +35,7 @@ function writeLocal(list: Review[]) {
 
 async function fetchApproved(): Promise<Review[]> {
   if (!REVIEWS_LIVE) return readLocal()
-  const sb = await client()
+  const sb = await supabase()
   const { data, error } = await sb
     .from('reviews')
     .select('id, product_id, name, city, rating, title, body, created_at')
@@ -61,11 +50,23 @@ async function insert(r: NewReview): Promise<'published'> {
     writeLocal([{ ...r, id: crypto.randomUUID(), created_at: new Date().toISOString() }, ...readLocal()])
     return 'published'
   }
-  const sb = await client()
+  const sb = await supabase()
   // Published immediately; hide a review later by unticking "approved" in Supabase.
   const { error } = await sb.from('reviews').insert({ ...r, approved: true })
   if (error) throw error
   return 'published'
+}
+
+async function removeReview(id: string): Promise<void> {
+  if (!REVIEWS_LIVE) {
+    writeLocal(readLocal().filter((r) => r.id !== id))
+    return
+  }
+  // Requires the signed-in admin session: the database only allows a delete
+  // from an authenticated request whose email matches is_admin().
+  const sb = await supabase()
+  const { error } = await sb.from('reviews').delete().eq('id', id)
+  if (error) throw error
 }
 
 interface ReviewState {
@@ -73,6 +74,7 @@ interface ReviewState {
   status: 'idle' | 'loading' | 'ready' | 'error'
   load: () => Promise<void>
   submit: (r: NewReview) => Promise<'published'>
+  deleteReview: (id: string) => Promise<void>
 }
 
 export const useReviews = create<ReviewState>((set, get) => ({
@@ -93,6 +95,10 @@ export const useReviews = create<ReviewState>((set, get) => ({
     const added: Review = { ...r, id: crypto.randomUUID(), created_at: new Date().toISOString() }
     set({ reviews: REVIEWS_LIVE ? [added, ...get().reviews] : readLocal() })
     return result
+  },
+  deleteReview: async (id) => {
+    await removeReview(id)
+    set({ reviews: get().reviews.filter((r) => r.id !== id) })
   },
 }))
 

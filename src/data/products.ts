@@ -1,3 +1,5 @@
+import { useAdminProducts } from '../store/admin-products'
+
 export type Category = 'shampoos' | 'hair-care' | 'skin-care' | 'soaps'
 
 export interface Product {
@@ -125,5 +127,22 @@ export const products: Product[] = [
   },
 ]
 
-export const byId = (id: string) => products.find((p) => p.id === id)
-export const inCategory = (c: Category) => products.filter((p) => p.category === c)
+/**
+ * Returns all products: built-in + admin-added. Pass the admin list from the
+ * `useAdminProducts` store when a component already has it (most do, via a hook,
+ * so it re-renders when products change); otherwise this reads the store's current
+ * state directly, which is always in sync with what the store last loaded.
+ */
+export function getAllProducts(adminProducts?: Product[]): Product[] {
+  if (adminProducts) return [...products, ...adminProducts]
+  // admin-products.ts imports only this module's *types*, which compile away,
+  // so importing its store value back here is not a real runtime cycle.
+  return [...products, ...useAdminProducts.getState().products]
+}
+
+export const byId = (id: string, adminProducts?: Product[]) =>
+  getAllProducts(adminProducts).find((p) => p.id === id)
+
+export const inCategory = (c: Category, adminProducts?: Product[]) =>
+  getAllProducts(adminProducts).filter((p) => p.category === c)
+

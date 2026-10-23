@@ -1,5 +1,6 @@
 import { useEffect, useRef, type ReactNode } from 'react'
 import { inCategory, type Category } from '../data/products'
+import { useAdminProducts } from '../store/admin-products'
 import { EMAIL, FACEBOOK_URL, INSTAGRAM_URL, PHONE_DISPLAY, PHONE_TEL, waLink } from '../lib/shop'
 import { ProductCard } from './ProductCard'
 import { Monogram } from './Header'
@@ -66,7 +67,8 @@ export function ProductSection({ id, category, title, intro, tone = 'dark' }: {
   id: string; category: Category; title: string; intro: string; tone?: 'dark' | 'light'
 }) {
   const ref = useReveal<HTMLDivElement>()
-  const items = inCategory(category)
+  const adminProducts = useAdminProducts((s) => s.products)
+  const items = inCategory(category, adminProducts)
   const cols = items.length === 2
     ? 'grid-cols-1 sm:grid-cols-2 mx-auto max-w-4xl'
     : 'grid-cols-2 lg:grid-cols-3'
@@ -327,7 +329,12 @@ export function Footer() {
 
         {/* Bottom section */}
         <div className="mt-10 flex flex-col items-center gap-3 border-t border-white/8 pt-8 sm:flex-row sm:justify-between">
-          <p className="text-sm text-ivory/40">© {new Date().getFullYear()} Nana Herbiotics · All rights reserved</p>
+          <p className="text-sm text-ivory/40">
+            © {new Date().getFullYear()} Nana Herbiotics · All rights reserved ·{' '}
+            <a href="#admin" className="text-ivory/30 underline-offset-4 hover:text-gold hover:underline">
+              Admin Portal
+            </a>
+          </p>
           <p className="flex items-center gap-2 text-sm text-ivory/40">
             <TruckIcon width={16} height={16} className="text-gold/50" />
             Cash on Delivery across Pakistan

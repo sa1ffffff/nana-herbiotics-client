@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import { byId } from '../data/products'
 import { CITIES, deliveryFor, formatPKR, FREE_DELIVERY_OVER, orderRef, PK_PHONE, waLink } from '../lib/shop'
+import { sendCustomerEmail, sendAdminEmail, EMAIL_CONFIGURED } from '../lib/email'
 import { useCart, useSubtotal, type CartLine } from '../store/cart'
+import { useOrders, type Order } from '../store/orders'
+import { useAdminProducts } from '../store/admin-products'
 import { CloseIcon, TrashIcon, TruckIcon, WhatsAppIcon } from './Icons'
 import { Overlay } from './Overlay'
 import { ProductImage } from './ProductImage'
@@ -10,16 +13,17 @@ import { Field } from './Sections'
 
 interface Customer {
   name: string
+  email: string
   phone: string
   address: string
   city: string
   notes: string
 }
 
-function buildMessage(lines: CartLine[], subtotal: number, c?: Customer, ref?: string) {
+function buildMessage(lines: CartLine[], subtotal: number, adminProducts: import('../data/products').Product[] = [], c?: Customer, ref?: string) {
   const delivery = deliveryFor(subtotal)
   const rows = lines.map((l, i) => {
-    const p = byId(l.productId)!
+    const p = byId(l.productId, adminProducts)!
     return `${i + 1}) ${p.name} ${p.size} × ${l.qty} = ${formatPKR(p.price * l.qty)}`
   })
   const parts = [
@@ -33,7 +37,7 @@ function buildMessage(lines: CartLine[], subtotal: number, c?: Customer, ref?: s
     'Payment: Cash on Delivery',
   ]
   if (c) {
-    parts.push('', `Name: ${c.name}`, `Phone: ${c.phone}`, `Address: ${c.address}, ${c.city}`)
+    parts.push('', `Name: ${c.name}`, `Email: ${c.email}`, `Phone: ${c.phone}`, `Address: ${c.address}, ${c.city}`)
     if (c.notes.trim()) parts.push(`Notes: ${c.notes.trim()}`)
   }
   return parts.join('\n')
@@ -42,6 +46,7 @@ function buildMessage(lines: CartLine[], subtotal: number, c?: Customer, ref?: s
 export function CartDrawer() {
   const { open, setOpen, step, setStep, lines } = useCart()
   const subtotal = useSubtotal()
+  const adminProducts = useAdminProducts((s) => s.products)
   const close = () => setOpen(false)
   const title = step === 'checkout' ? 'Checkout' : step === 'done' ? 'Order sent' : 'Your cart'
 
@@ -56,9 +61,9 @@ export function CartDrawer() {
       </div>
 
       {step === 'done' ? <Done onClose={close} /> : lines.length === 0 ? <Empty onClose={close} /> : step === 'checkout' ? (
-        <Checkout lines={lines} subtotal={subtotal} onBack={() => setStep('cart')} />
+        <Checkout lines={lines} subtotal={subtotal} onBack={() => setStep('cart')} adminProducts={adminProducts} />
       ) : (
-        <CartList lines={lines} subtotal={subtotal} onCheckout={() => setStep('checkout')} />
+        <CartList lines={lines} subtotal={subtotal} onCheckout={() => setStep('checkout')} adminProducts={adminProducts} />
       )}
     </Overlay>
   )
@@ -121,13 +126,13 @@ function Totals({ subtotal }: { subtotal: number }) {
   )
 }
 
-function CartList({ lines, subtotal, onCheckout }: { lines: CartLine[]; subtotal: number; onCheckout: () => void }) {
+function CartList({ lines, subtotal, onCheckout, adminProducts }: { lines: CartLine[]; subtotal: number; onCheckout: () => void; adminProducts: import('../data/products').Product[] }) {
   const { setQty, remove } = useCart()
   return (
     <>
       <ul className="flex-1 divide-y divide-forest/6 overflow-y-auto px-5">
         {lines.map((l) => {
-          const p = byId(l.productId)
+          const p = byId(l.productId, adminProducts)
           if (!p) return null
           return (
             <li key={l.productId} className="flex gap-4 py-5">
@@ -157,7 +162,7 @@ function CartList({ lines, subtotal, onCheckout }: { lines: CartLine[]; subtotal
           Checkout · Cash on Delivery
         </button>
         <a
-          href={waLink(buildMessage(lines, subtotal))}
+          href={waLink(buildMessage(lines, subtotal, adminProducts))}
           target="_blank"
           rel="noopener"
           className="press flex h-13 w-full items-center justify-center gap-2 rounded-full border border-[#25d366]/40 font-semibold text-[#22c55e] transition-all hover:bg-[#25d366]/5 hover:border-[#25d366]/60"
@@ -169,19 +174,22 @@ function CartList({ lines, subtotal, onCheckout }: { lines: CartLine[]; subtotal
   )
 }
 
-function Checkout({ lines, subtotal, onBack }: { lines: CartLine[]; subtotal: number; onBack: () => void }) {
+function Checkout({ lines, subtotal, onBack, adminProducts }: { lines: CartLine[]; subtotal: number; onBack: () => void; adminProducts: import('../data/products').Product[] }) {
   const { clear, setStep } = useCart()
+  const addOrder = useOrders((s) => s.addOrder)
   const [errors, setErrors] = useState<Partial<Record<keyof Customer, string>>>({})
+  const [sending, setSending] = useState(false)
 
   return (
     <form
       noValidate
       className="flex flex-1 flex-col overflow-hidden"
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault()
         const f = new FormData(e.currentTarget)
         const c: Customer = {
           name: String(f.get('name') ?? '').trim(),
+          email: String(f.get('email') ?? '').trim(),
           phone: String(f.get('phone') ?? '').replace(/\s/g, ''),
           address: String(f.get('address') ?? '').trim(),
           city: String(f.get('city') ?? '').trim(),
@@ -189,6 +197,7 @@ function Checkout({ lines, subtotal, onBack }: { lines: CartLine[]; subtotal: nu
         }
         const err: typeof errors = {}
         if (c.name.length < 2) err.name = 'Please enter your name.'
+        if (!c.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.email)) err.email = 'Please enter a valid email address.'
         if (!PK_PHONE.test(c.phone)) err.phone = 'Use a mobile number like 0330-7072774.'
         if (c.address.length < 6) err.address = 'Please enter your full address with house and street.'
         if (!c.city) err.city = 'Please choose your city.'
@@ -197,15 +206,48 @@ function Checkout({ lines, subtotal, onBack }: { lines: CartLine[]; subtotal: nu
           e.currentTarget.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus()
           return
         }
+
+        setSending(true)
         const ref = orderRef()
-        window.open(waLink(buildMessage(lines, subtotal, c, ref)), '_blank', 'noopener')
+        const delivery = deliveryFor(subtotal)
+
+        // Build order record
+        const order: Order = {
+          orderId: ref,
+          customerName: c.name,
+          customerEmail: c.email,
+          customerPhone: c.phone,
+          products: lines.map((l) => {
+            const p = byId(l.productId, adminProducts)!
+            return { name: p.name, size: p.size, qty: l.qty, price: p.price }
+          }),
+          subtotal,
+          delivery,
+          total: subtotal + delivery,
+          city: c.city,
+          address: c.address,
+          notes: c.notes.trim(),
+          dateTime: new Date().toLocaleString('en-PK', { dateStyle: 'medium', timeStyle: 'short' }),
+        }
+
+        // Save the order (Supabase when configured; this never blocks or fails checkout)
+        await addOrder(order)
+
+        // Send emails (non-blocking)
+        sendCustomerEmail(order).catch(() => {})
+        sendAdminEmail(order).catch(() => {})
+
+        // Open WhatsApp
+        window.open(waLink(buildMessage(lines, subtotal, adminProducts, c, ref)), '_blank', 'noopener')
         sessionStorage.setItem('nh-last-ref', ref)
         clear()
         setStep('done')
+        setSending(false)
       }}
     >
       <div className="flex-1 space-y-4 overflow-y-auto p-5">
         <Field label="Full name" name="name" autoComplete="name" error={errors.name} />
+        <Field label="Email address" name="email" type="email" inputMode="email" autoComplete="email" placeholder="your@email.com" error={errors.email} />
         <Field label="Mobile number" name="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="03XX-XXXXXXX" error={errors.phone} />
         <Field label="Address" name="address" autoComplete="street-address" placeholder="House, street, area" error={errors.address} />
         <label className="block">
@@ -241,10 +283,14 @@ function Checkout({ lines, subtotal, onBack }: { lines: CartLine[]; subtotal: nu
       </div>
       <div className="shrink-0 space-y-3 border-t border-forest/8 bg-white p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
         <Totals subtotal={subtotal} />
-        <button type="submit" className="press flex h-13 w-full items-center justify-center gap-2 rounded-full bg-[#25d366] font-semibold text-white shadow-[0_8px_24px_-8px_rgb(37_211_102/0.4)] transition-all hover:bg-[#22c55e] hover:shadow-[0_12px_32px_-8px_rgb(37_211_102/0.5)]">
-          <WhatsAppIcon width={20} height={20} /> Place order on WhatsApp
+        <button type="submit" disabled={sending} className="press flex h-13 w-full items-center justify-center gap-2 rounded-full bg-[#25d366] font-semibold text-white shadow-[0_8px_24px_-8px_rgb(37_211_102/0.4)] transition-all hover:bg-[#22c55e] hover:shadow-[0_12px_32px_-8px_rgb(37_211_102/0.5)] disabled:opacity-60">
+          <WhatsAppIcon width={20} height={20} /> {sending ? 'Placing order…' : 'Place order on WhatsApp'}
         </button>
-        <p className="text-center text-xs text-ink/50">Your order details open in WhatsApp. Just press send.</p>
+        <p className="text-center text-xs text-ink/50">
+          {EMAIL_CONFIGURED
+            ? 'A confirmation email will be sent to you. Your order also opens in WhatsApp.'
+            : 'Your order details open in WhatsApp. Just press send.'}
+        </p>
         <button type="button" onClick={onBack} className="w-full py-2 text-sm font-medium text-forest transition-colors underline-offset-4 hover:text-forest-deep hover:underline">
           ← Back to cart
         </button>
@@ -267,7 +313,9 @@ function Done({ onClose }: { onClose: () => void }) {
       <p className="font-display text-2xl font-bold text-forest">Thank you!</p>
       {ref && <p className="rounded-full bg-gold/15 px-5 py-2 font-semibold tracking-wide text-forest tabular-nums">{ref}</p>}
       <p className="max-w-xs text-ink/65">
-        Please press <strong className="text-forest">send</strong> in WhatsApp so we receive your order. We will call to confirm before delivery.
+        {EMAIL_CONFIGURED
+          ? <>A confirmation email has been sent to your inbox. Please also press <strong className="text-forest">send</strong> in WhatsApp so we receive your order.</>
+          : <>Please press <strong className="text-forest">send</strong> in WhatsApp so we receive your order. We will call to confirm before delivery.</>}
       </p>
       <button type="button" onClick={onClose} className="press mt-3 h-12 rounded-full bg-forest px-8 font-semibold text-ivory shadow-[0_4px_16px_-4px_rgb(14_32_24/0.4)]">
         Continue shopping
