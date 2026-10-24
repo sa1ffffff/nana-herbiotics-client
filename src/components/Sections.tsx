@@ -68,7 +68,11 @@ export function ProductSection({ id, category, title, intro, tone = 'dark' }: {
 }) {
   const ref = useReveal<HTMLDivElement>()
   const adminProducts = useAdminProducts((s) => s.products)
-  const items = inCategory(category, adminProducts)
+  const removedIds = useAdminProducts((s) => s.removedIds)
+  const items = inCategory(category, adminProducts, removedIds)
+
+  if (items.length === 0) return null
+
   const cols = items.length === 2
     ? 'grid-cols-1 sm:grid-cols-2 mx-auto max-w-4xl'
     : 'grid-cols-2 lg:grid-cols-3'

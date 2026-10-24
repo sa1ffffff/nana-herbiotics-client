@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
-import { type Category, type Product, getAllProducts } from '../data/products'
+import { type Category, type Product, getAllProducts, getAllKnownProducts } from '../data/products'
 import { useAdminProducts, CATEGORIES } from '../store/admin-products'
 import { useOrders } from '../store/orders'
 import { useReviews, type Review } from '../lib/reviews'
 import { useAuth } from '../store/auth'
 import { exportOrdersToExcel } from '../lib/export-orders'
 import { formatPKR } from '../lib/shop'
-import { CloseIcon, TrashIcon } from './Icons'
+import { CloseIcon, TrashIcon, UndoIcon } from './Icons'
 import { Stars } from './Stars'
 import { Monogram } from './Header'
 
@@ -95,17 +95,24 @@ export function AdminPanel({ onViewSite }: { onViewSite?: () => void } = {}) {
 
 function ProductsTab() {
   const adminProducts = useAdminProducts((s) => s.products)
+  const removedIds = useAdminProducts((s) => s.removedIds)
   const status = useAdminProducts((s) => s.status)
   const load = useAdminProducts((s) => s.load)
   const removeProduct = useAdminProducts((s) => s.removeProduct)
+  const restoreProduct = useAdminProducts((s) => s.restoreProduct)
   const [showForm, setShowForm] = useState(false)
   const [removing, setRemoving] = useState<string | null>(null)
-  const allProducts = getAllProducts(adminProducts)
+  const [restoring, setRestoring] = useState<string | null>(null)
+  const [filter, setFilter] = useState<'active' | 'removed'>('active')
+
+  const activeProducts = getAllProducts(adminProducts, removedIds)
+  const allKnown = getAllKnownProducts(adminProducts)
+  const removedProducts = allKnown.filter((p) => removedIds.includes(p.id))
 
   useEffect(() => { load() }, [load])
 
   const handleRemove = async (id: string, name: string) => {
-    if (!confirm(`Remove "${name}"? This cannot be undone.`)) return
+    if (!confirm(`Are you sure you want to remove "${name}"? It will no longer be visible to customers on the website.`)) return
     setRemoving(id)
     try {
       await removeProduct(id)
@@ -115,50 +122,147 @@ function ProductsTab() {
     setRemoving(null)
   }
 
+  const handleRestore = async (id: string) => {
+    setRestoring(id)
+    try {
+      await restoreProduct(id)
+    } catch {
+      alert('Could not restore the product. Please try again.')
+    }
+    setRestoring(null)
+  }
+
+  const displayedProducts = filter === 'active' ? activeProducts : removedProducts
+
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="font-display text-2xl font-bold text-forest">Products</h2>
-          <p className="mt-1 text-sm text-ink/60">{allProducts.length} products total · {adminProducts.length} added by admin</p>
+          <p className="mt-1 text-sm text-ink/60">
+            {activeProducts.length} active {activeProducts.length === 1 ? 'product' : 'products'} on store
+            {removedProducts.length > 0 && ` · ${removedProducts.length} removed`}
+          </p>
         </div>
-        <button
-          type="button"
-          onClick={() => setShowForm(true)}
-          className="press rounded-full bg-forest px-5 py-2.5 text-sm font-semibold text-ivory shadow-[0_4px_16px_-4px_rgb(14_32_24/0.4)] transition-all hover:bg-forest-deep"
-        >
-          + Add Product
-        </button>
+        <div className="flex flex-wrap items-center gap-3">
+          {removedProducts.length > 0 && (
+            <div className="flex rounded-full border border-forest/15 bg-white p-1 shadow-xs">
+              <button
+                type="button"
+                onClick={() => setFilter('active')}
+                className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
+                  filter === 'active' ? 'bg-forest text-ivory' : 'text-ink/60 hover:text-forest'
+                }`}
+              >
+                Active ({activeProducts.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setFilter('removed')}
+                className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
+                  filter === 'removed' ? 'bg-hibiscus text-white' : 'text-ink/60 hover:text-hibiscus'
+                }`}
+              >
+                Removed ({removedProducts.length})
+              </button>
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={() => setShowForm(true)}
+            className="press rounded-full bg-forest px-5 py-2.5 text-sm font-semibold text-ivory shadow-[0_4px_16px_-4px_rgb(14_32_24/0.4)] transition-all hover:bg-forest-deep"
+          >
+            + Add Product
+          </button>
+        </div>
       </div>
 
       {status === 'error' && (
         <p className="mb-6 rounded-xl bg-hibiscus/10 p-4 text-sm text-hibiscus">
-          Could not load admin-added products. Check your connection and refresh.
+          Could not load live products from server. Showing local cache. Check your connection.
         </p>
       )}
 
       {showForm && <AddProductForm onClose={() => setShowForm(false)} />}
 
+      {filter === 'active' && activeProducts.length === 0 && (
+        <div className="rounded-2xl border border-dashed border-forest/20 px-6 py-14 text-center">
+          <p className="font-semibold text-forest">No active products on the store.</p>
+          <p className="mt-1 text-sm text-ink/60">All products have been removed or none were added yet.</p>
+          {removedProducts.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setFilter('removed')}
+              className="mt-4 rounded-full bg-forest px-4 py-2 text-xs font-semibold text-ivory hover:bg-forest-deep"
+            >
+              View {removedProducts.length} removed {removedProducts.length === 1 ? 'product' : 'products'} to restore
+            </button>
+          )}
+        </div>
+      )}
+
+      {filter === 'removed' && removedProducts.length === 0 && (
+        <div className="rounded-2xl border border-dashed border-forest/20 px-6 py-14 text-center">
+          <p className="font-semibold text-forest">No removed products.</p>
+          <p className="mt-1 text-sm text-ink/60">All products are currently active on the store.</p>
+          <button
+            type="button"
+            onClick={() => setFilter('active')}
+            className="mt-4 rounded-full bg-forest px-4 py-2 text-xs font-semibold text-ivory hover:bg-forest-deep"
+          >
+            Back to Active Products
+          </button>
+        </div>
+      )}
+
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {allProducts.map((p) => (
-          <ProductAdminCard
-            key={p.id}
-            product={p}
-            isAdmin={'adminAdded' in p}
-            removing={removing === p.id}
-            onRemove={() => handleRemove(p.id, p.name)}
-          />
-        ))}
+        {displayedProducts.map((p) => {
+          const isRem = removedIds.includes(p.id)
+          return (
+            <ProductAdminCard
+              key={p.id}
+              product={p}
+              isAdmin={'adminAdded' in p}
+              isRemoved={isRem}
+              removing={removing === p.id}
+              restoring={restoring === p.id}
+              onRemove={() => handleRemove(p.id, p.name)}
+              onRestore={() => handleRestore(p.id)}
+            />
+          )
+        })}
       </div>
     </div>
   )
 }
 
-function ProductAdminCard({ product, isAdmin, onRemove, removing }: { product: Product; isAdmin: boolean; onRemove: () => void; removing: boolean }) {
+function ProductAdminCard({
+  product,
+  isAdmin,
+  isRemoved,
+  onRemove,
+  onRestore,
+  removing,
+  restoring,
+}: {
+  product: Product
+  isAdmin: boolean
+  isRemoved?: boolean
+  onRemove: () => void
+  onRestore?: () => void
+  removing: boolean
+  restoring?: boolean
+}) {
   const imgSrc = /^https?:\/\//.test(product.image) ? product.image : `${product.image}-500.webp`
 
   return (
-    <div className={`flex gap-4 rounded-2xl border border-forest/10 bg-white p-4 shadow-sm transition-opacity ${removing ? 'opacity-50' : ''}`}>
+    <div
+      className={`flex gap-4 rounded-2xl border p-4 shadow-sm transition-all ${
+        isRemoved
+          ? 'border-hibiscus/25 bg-white/75 opacity-80'
+          : 'border-forest/10 bg-white'
+      } ${removing || restoring ? 'opacity-50 pointer-events-none' : ''}`}
+    >
       <img
         src={imgSrc}
         alt={product.alt}
@@ -170,26 +274,52 @@ function ProductAdminCard({ product, isAdmin, onRemove, removing }: { product: P
             <p className="font-semibold leading-snug text-forest">{product.name}</p>
             <p className="text-sm text-ink/50">{product.size} · {product.category}</p>
           </div>
-          {isAdmin && (
+          {isRemoved ? (
+            <button
+              type="button"
+              onClick={onRestore}
+              disabled={restoring}
+              className="press flex items-center gap-1.5 rounded-full border border-forest/20 bg-forest/5 px-3 py-1.5 text-xs font-semibold text-forest transition-colors hover:bg-forest hover:text-ivory disabled:opacity-40"
+              aria-label={`Restore ${product.name}`}
+              title="Restore to storefront"
+            >
+              <UndoIcon width={13} height={13} />
+              <span>{restoring ? 'Restoring…' : 'Restore'}</span>
+            </button>
+          ) : (
             <button
               type="button"
               onClick={onRemove}
               disabled={removing}
               className="press grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink/35 transition-colors hover:bg-hibiscus/10 hover:text-hibiscus disabled:opacity-40"
               aria-label={`Remove ${product.name}`}
+              title={`Remove ${product.name} from store`}
             >
-              <TrashIcon width={16} height={16} />
+              {removing ? (
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-hibiscus/30 border-t-hibiscus" />
+              ) : (
+                <TrashIcon width={16} height={16} />
+              )}
             </button>
           )}
         </div>
         <p className="mt-1 text-sm font-bold text-forest tabular-nums">{formatPKR(product.price)}</p>
         <p className="mt-1 line-clamp-2 text-xs text-ink/60">{product.short}</p>
-        {isAdmin && (
-          <span className="mt-2 self-start rounded-full bg-gold/20 px-2 py-0.5 text-[10px] font-semibold text-forest">Admin Added</span>
-        )}
-        {!isAdmin && (
-          <span className="mt-2 self-start rounded-full bg-forest/10 px-2 py-0.5 text-[10px] font-semibold text-forest/60">Built-in</span>
-        )}
+        <div className="mt-2 flex items-center gap-2">
+          {isRemoved ? (
+            <span className="rounded-full bg-hibiscus/15 px-2 py-0.5 text-[10px] font-semibold text-hibiscus">
+              Removed from Store
+            </span>
+          ) : isAdmin ? (
+            <span className="rounded-full bg-gold/20 px-2 py-0.5 text-[10px] font-semibold text-forest">
+              Admin Added
+            </span>
+          ) : (
+            <span className="rounded-full bg-forest/10 px-2 py-0.5 text-[10px] font-semibold text-forest/70">
+              Built-in
+            </span>
+          )}
+        </div>
       </div>
     </div>
   )

@@ -23,8 +23,11 @@ interface Customer {
 function buildMessage(lines: CartLine[], subtotal: number, adminProducts: import('../data/products').Product[] = [], c?: Customer, ref?: string) {
   const delivery = deliveryFor(subtotal)
   const rows = lines.map((l, i) => {
-    const p = byId(l.productId, adminProducts)!
-    return `${i + 1}) ${p.name} ${p.size} × ${l.qty} = ${formatPKR(p.price * l.qty)}`
+    const p = byId(l.productId, adminProducts)
+    const name = p?.name ?? 'Item'
+    const size = p?.size ? ` ${p.size}` : ''
+    const price = p?.price ?? 0
+    return `${i + 1}) ${name}${size} × ${l.qty} = ${formatPKR(price * l.qty)}`
   })
   const parts = [
     ref ? `Assalam-o-Alaikum! New order ${ref} from the Nana Herbiotics website:` : 'Assalam-o-Alaikum! I would like to order:',
@@ -218,8 +221,13 @@ function Checkout({ lines, subtotal, onBack, adminProducts }: { lines: CartLine[
           customerEmail: c.email,
           customerPhone: c.phone,
           products: lines.map((l) => {
-            const p = byId(l.productId, adminProducts)!
-            return { name: p.name, size: p.size, qty: l.qty, price: p.price }
+            const p = byId(l.productId, adminProducts)
+            return {
+              name: p?.name ?? 'Item',
+              size: p?.size ?? '',
+              qty: l.qty,
+              price: p?.price ?? 0,
+            }
           }),
           subtotal,
           delivery,

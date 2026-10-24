@@ -128,21 +128,30 @@ export const products: Product[] = [
 ]
 
 /**
- * Returns all products: built-in + admin-added. Pass the admin list from the
- * `useAdminProducts` store when a component already has it (most do, via a hook,
- * so it re-renders when products change); otherwise this reads the store's current
- * state directly, which is always in sync with what the store last loaded.
+ * Returns active products: built-in + admin-added, minus any products removed by the admin.
+ * Pass adminProducts and removedIds from `useAdminProducts` when calling from a component
+ * so it re-renders when products change; otherwise it reads the store state directly.
  */
-export function getAllProducts(adminProducts?: Product[]): Product[] {
-  if (adminProducts) return [...products, ...adminProducts]
-  // admin-products.ts imports only this module's *types*, which compile away,
-  // so importing its store value back here is not a real runtime cycle.
-  return [...products, ...useAdminProducts.getState().products]
+export function getAllProducts(adminProducts?: Product[], removedIds?: string[]): Product[] {
+  const admin = adminProducts ?? useAdminProducts.getState().products
+  const removed = new Set(removedIds ?? useAdminProducts.getState().removedIds ?? [])
+  return [...products, ...admin].filter((p) => !removed.has(p.id))
 }
 
-export const byId = (id: string, adminProducts?: Product[]) =>
-  getAllProducts(adminProducts).find((p) => p.id === id)
+/**
+ * Returns all products ever registered (including removed ones).
+ * Useful for the Admin Panel's removed products view and cart safety fallback.
+ */
+export function getAllKnownProducts(adminProducts?: Product[]): Product[] {
+  const admin = adminProducts ?? useAdminProducts.getState().products
+  return [...products, ...admin]
+}
 
-export const inCategory = (c: Category, adminProducts?: Product[]) =>
-  getAllProducts(adminProducts).filter((p) => p.category === c)
+export const byId = (id: string, adminProducts?: Product[], removedIds?: string[]) =>
+  getAllProducts(adminProducts, removedIds).find((p) => p.id === id) ||
+  getAllKnownProducts(adminProducts).find((p) => p.id === id)
+
+export const inCategory = (c: Category, adminProducts?: Product[], removedIds?: string[]) =>
+  getAllProducts(adminProducts, removedIds).filter((p) => p.category === c)
+
 

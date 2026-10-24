@@ -17,9 +17,10 @@ export function QuickView() {
   const [qty, setQty] = useState(1)
   const showReviewForm = useReviewForm((s) => s.show)
   const adminProducts = useAdminProducts((s) => s.products)
+  const removedIds = useAdminProducts((s) => s.removedIds)
   const [lastId, setLastId] = useState(id)
   if (id && id !== lastId) setLastId(id)
-  const product = byId(id ?? lastId ?? '', adminProducts)
+  const product = byId(id ?? lastId ?? '', adminProducts, removedIds)
 
   useEffect(() => setQty(1), [id])
 

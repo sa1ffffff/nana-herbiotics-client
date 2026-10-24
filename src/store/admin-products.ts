@@ -5,6 +5,8 @@ import { SUPABASE_CONFIGURED, supabase } from '../lib/supabaseClient'
 export type AdminProduct = Product & { adminAdded: true }
 
 const LOCAL_KEY = 'nh-admin-products'
+const LOCAL_REMOVED_KEY = 'nh-removed-products'
+
 function readLocal(): AdminProduct[] {
   try {
     return JSON.parse(localStorage.getItem(LOCAL_KEY) ?? '[]')
@@ -17,6 +19,21 @@ function writeLocal(list: AdminProduct[]) {
     localStorage.setItem(LOCAL_KEY, JSON.stringify(list))
   } catch {
     /* storage blocked: product simply isn't kept */
+  }
+}
+
+function readLocalRemoved(): string[] {
+  try {
+    return JSON.parse(localStorage.getItem(LOCAL_REMOVED_KEY) ?? '[]')
+  } catch {
+    return []
+  }
+}
+function writeLocalRemoved(list: string[]) {
+  try {
+    localStorage.setItem(LOCAL_REMOVED_KEY, JSON.stringify(list))
+  } catch {
+    /* storage blocked */
   }
 }
 
@@ -40,10 +57,12 @@ function slugify(name: string) {
 
 interface AdminProductsState {
   products: AdminProduct[]
+  removedIds: string[]
   status: 'idle' | 'loading' | 'ready' | 'error'
   load: () => Promise<void>
   addProduct: (p: NewProduct) => Promise<void>
   removeProduct: (id: string) => Promise<void>
+  restoreProduct: (id: string) => Promise<void>
 }
 
 async function fetchAll(): Promise<AdminProduct[]> {
@@ -54,14 +73,54 @@ async function fetchAll(): Promise<AdminProduct[]> {
   return (data ?? []).map((row) => ({ ...row, adminAdded: true }) as AdminProduct)
 }
 
+async function fetchRemoved(): Promise<string[]> {
+  if (!SUPABASE_CONFIGURED) return readLocalRemoved()
+  try {
+    const sb = await supabase()
+    const { data, error } = await sb.storage.from('product-images').download('removed-products.json')
+    if (error || !data) return readLocalRemoved()
+    const text = await data.text()
+    const parsed = JSON.parse(text)
+    if (Array.isArray(parsed)) {
+      writeLocalRemoved(parsed)
+      return parsed
+    }
+  } catch {
+    /* fallback to local cache */
+  }
+  return readLocalRemoved()
+}
+
+async function persistRemoved(ids: string[]): Promise<void> {
+  writeLocalRemoved(ids)
+  if (!SUPABASE_CONFIGURED) return
+  try {
+    const sb = await supabase()
+    const blob = new Blob([JSON.stringify(ids)], { type: 'application/json' })
+    await sb.storage.from('product-images').upload('removed-products.json', blob, {
+      upsert: true,
+      cacheControl: '0',
+    })
+  } catch (err) {
+    console.warn('Could not persist removed-products.json to Supabase storage:', err)
+  }
+}
+
 export const useAdminProducts = create<AdminProductsState>((set, get) => ({
-  products: [],
+  products: readLocal(),
+  removedIds: readLocalRemoved(),
   status: 'idle',
   load: async () => {
     if (get().status === 'loading') return
     set({ status: 'loading' })
     try {
-      set({ products: await fetchAll(), status: 'ready' })
+      const [remoteProducts, remoteRemoved] = await Promise.all([
+        fetchAll(),
+        fetchRemoved(),
+      ])
+      writeLocal(remoteProducts)
+      writeLocalRemoved(remoteRemoved)
+      set({ products: remoteProducts, removedIds: remoteRemoved, status: 'ready' })
     } catch {
       set({ status: 'error' })
     }
@@ -94,27 +153,50 @@ export const useAdminProducts = create<AdminProductsState>((set, get) => ({
     const sb = await supabase()
     const { error } = await sb.from('products').insert(row)
     if (error) throw error
-    set({ products: [...get().products, { ...row, adminAdded: true }] })
+    const next = [...get().products, { ...row, adminAdded: true as const }]
+    writeLocal(next)
+    set({ products: next })
   },
   removeProduct: async (id) => {
-    if (!SUPABASE_CONFIGURED) {
-      const next = readLocal().filter((p) => p.id !== id)
-      writeLocal(next)
-      set({ products: next })
-      return
+    const state = get()
+    const isAdminAdded = state.products.some((p) => p.id === id)
+
+    // 1. If it was added to the Supabase products table, remove it there and clean up images.
+    if (isAdminAdded) {
+      if (!SUPABASE_CONFIGURED) {
+        const next = readLocal().filter((p) => p.id !== id)
+        writeLocal(next)
+        set({ products: next })
+      } else {
+        const sb = await supabase()
+        const { error } = await sb.from('products').delete().eq('id', id)
+        if (error) throw error
+        try {
+          const { data } = await sb.storage.from('product-images').list('', { search: id })
+          const names = (data ?? []).map((f) => f.name).filter((n) => n.startsWith(`${id}.`))
+          if (names.length) await sb.storage.from('product-images').remove(names)
+        } catch {
+          /* image cleanup is best-effort */
+        }
+        const next = state.products.filter((p) => p.id !== id)
+        writeLocal(next)
+        set({ products: next })
+      }
     }
-    const sb = await supabase()
-    const { error } = await sb.from('products').delete().eq('id', id)
-    if (error) throw error
-    // Best-effort: also remove any uploaded image at <id>.<ext>; harmless if none exists.
-    try {
-      const { data } = await sb.storage.from('product-images').list('', { search: id })
-      const names = (data ?? []).map((f) => f.name).filter((n) => n.startsWith(`${id}.`))
-      if (names.length) await sb.storage.from('product-images').remove(names)
-    } catch {
-      /* image cleanup is best-effort */
+
+    // 2. Mark in removedIds so built-in products (and any cached products) disappear everywhere.
+    if (!state.removedIds.includes(id)) {
+      const nextRemoved = [...state.removedIds, id]
+      set({ removedIds: nextRemoved })
+      await persistRemoved(nextRemoved)
     }
-    set({ products: get().products.filter((p) => p.id !== id) })
+  },
+  restoreProduct: async (id) => {
+    const state = get()
+    if (!state.removedIds.includes(id)) return
+    const nextRemoved = state.removedIds.filter((item) => item !== id)
+    set({ removedIds: nextRemoved })
+    await persistRemoved(nextRemoved)
   },
 }))
 

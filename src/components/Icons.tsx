@@ -51,6 +51,12 @@ export const TrashIcon = (p: P) => (
     <path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3" />
   </svg>
 )
+export const UndoIcon = (p: P) => (
+  <svg {...base(p)}>
+    <path d="M3 7v6h6" />
+    <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13" />
+  </svg>
+)
 export const LeafIcon = (p: P) => (
   <svg {...base(p)}>
     <path d="M5 19c0-9 6-14 15-14 0 9-5 15-14 15" />

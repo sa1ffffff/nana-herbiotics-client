@@ -20,7 +20,8 @@ const dateFmt = new Intl.DateTimeFormat('en-PK', { day: 'numeric', month: 'short
 
 function ReviewCard({ r }: { r: Review }) {
   const adminProducts = useAdminProducts((s) => s.products)
-  const product = byId(r.product_id, adminProducts)
+  const removedIds = useAdminProducts((s) => s.removedIds)
+  const product = byId(r.product_id, adminProducts, removedIds)
   return (
     <article className="flex h-full flex-col gap-3 rounded-2xl border border-gold/20 bg-forest-soft/40 p-5 text-ivory">
       <div className="flex items-center justify-between gap-3">
@@ -45,7 +46,8 @@ export function Reviews() {
   const { reviews, status, load } = useReviews()
   const show = useReviewForm((s) => s.show)
   const adminProducts = useAdminProducts((s) => s.products)
-  const allProducts = getAllProducts(adminProducts)
+  const removedIds = useAdminProducts((s) => s.removedIds)
+  const allProducts = getAllProducts(adminProducts, removedIds)
   const [filter, setFilter] = useState('all')
   const [limit, setLimit] = useState(6)
 
@@ -159,7 +161,8 @@ export function ReviewForm() {
   const { open, productId, hide } = useReviewForm()
   const submit = useReviews((s) => s.submit)
   const adminProducts = useAdminProducts((s) => s.products)
-  const allProducts = getAllProducts(adminProducts)
+  const removedIds = useAdminProducts((s) => s.removedIds)
+  const allProducts = getAllProducts(adminProducts, removedIds)
   const [rating, setRating] = useState(0)
   const [errors, setErrors] = useState<Errors>({})
   const [state, setState] = useState<'form' | 'sending' | 'pending' | 'published'>('form')

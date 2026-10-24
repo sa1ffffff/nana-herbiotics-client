@@ -9,6 +9,8 @@ import { About, Contact, Footer, MarqueeBand, ProductSection, Promises } from '.
 import { useCart } from './store/cart'
 import { useAuth } from './store/auth'
 import { AdminLogin } from './components/AdminLogin'
+import { Maintenance } from './components/Maintenance'
+import { MAINTENANCE_MODE } from './lib/maintenance'
 import { useAdminProducts } from './store/admin-products'
 
 // The admin dashboard (and the xlsx export library it pulls in) is heavy and only
@@ -126,7 +128,6 @@ function PublicSite() {
       <ReviewForm />
       <Toast />
       <BackToTop />
-      <AdminLogin />
     </>
   )
 }
@@ -193,8 +194,20 @@ export default function App() {
     )
   }
 
+  // Admins always bypass maintenance mode, so they can keep working (and flip
+  // the flag back off) while the public sees the notice below.
+  if (MAINTENANCE_MODE && !isAdmin) {
+    return (
+      <>
+        <Maintenance />
+        <AdminLogin />
+      </>
+    )
+  }
+
   return (
     <>
+      <AdminLogin />
       {isAdmin && (
         <aside
           aria-label="Admin bar"
